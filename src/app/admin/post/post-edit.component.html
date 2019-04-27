@@ -1,0 +1,25 @@
+<h1>{{post.title}}</h1>
+<div class="post" *ngIf="post">
+    <div class="header">
+        <div class="author">Author: <a [routerLink]="['/user', post.author]">{{post.author}}</a></div>
+        <div class="status">Status: {{post.status}}</div>
+    </div>
+    <div class="content">{{post.text}}</div>
+</div>
+<h3>Comments:</h3>
+<table>
+    <tr>
+        <th>Author</th>
+        <th>Text</th>
+        <th>Approved</th>
+    </tr>
+    <tr *ngFor="let comment of post.comments">
+        <td>{{comment.author}}</td>
+        <td>{{comment.text}}</td>
+        <td *ngIf="comment.approved">approved</td>
+        <td *ngIf="!comment.approved">
+            not approved
+            <button (click)="approve(comment)">Approve</button>
+        </td>
+    </tr>
+</table>

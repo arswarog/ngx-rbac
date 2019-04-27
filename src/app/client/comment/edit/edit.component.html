@@ -1,0 +1,9 @@
+<div class="comment">
+    <form [formGroup]="comment">
+        <div class="author">
+            <a [name]="'comment'+comment.id"></a>
+            {{comment.author}}
+        </div>
+        <div class="content">{{comment.text}}</div>
+    </form>
+</div>

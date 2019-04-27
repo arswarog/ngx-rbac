@@ -1,0 +1,19 @@
+<div>
+    <h1>Control</h1>
+    <h3>Users</h3>
+    <ul class="roles">
+        <li *ngFor="let item of users"
+            [ngClass]="{selected: item.id === user}"
+            class="link"
+            (click)="setUser(item)"
+        >{{item.id}}</li>
+    </ul>
+    <h3>Roles</h3>
+    <ul class="roles">
+        <li *ngFor="let role of roles | keyvalue"
+            [class]="role.value"
+        >{{role.key}}</li>
+    </ul>
+    <pre>{{rbacService.allRoles | json}}</pre>
+    <pre>{{rbacService.roles | json}}</pre>
+</div>
