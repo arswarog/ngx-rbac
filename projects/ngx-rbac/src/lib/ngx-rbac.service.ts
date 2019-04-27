@@ -1,7 +1,7 @@
-import { Inject, Injectable, Optional } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { Inject, Injectable, InjectionToken } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { RbacConfig, RbacRule, RbacRules } from './rbac.interface';
-import { distinctUntilChanged, tap } from 'rxjs/operators';
+import { Config } from './tokens';
 
 @Injectable({
     providedIn: 'root',
@@ -10,7 +10,7 @@ export class NgxRbacService {
     /**
      * List of current roles
      */
-    public roles: Readonly<RbacRules> = {};
+    public roles: Readonly<RbacRules>    = {};
     /**
      * List of current roles
      */
@@ -20,28 +20,21 @@ export class NgxRbacService {
      */
     public allRoles: Readonly<RbacRules> = {};
 
-    constructor(@Inject('rules') private rules: RbacRules,
-                @Inject('config') private config: RbacConfig,
-                // @Inject('ROUTES') routes,
-    ) {
-        setInterval(() => console.log(this.rules), 5000);
-        setTimeout(() => console.log(this.rules), 1000);
-        // console.log('ROUTES', routes);
+    private rules: RbacRules = {};
 
-        console.log('SERVICE', rules, config);
-
-        this.registerRules(rules);
-
+    constructor(@Inject(Config) private config: RbacConfig) {
         this.can = this.can.bind(this);
+        if (this.config.debug) {
+            console.group('[NgxRbac] initialization');
+            console.log('Config:', config);
+            console.groupEnd();
 
+        }
         this.setBaseRoles(config.defaultRoles || ['default']);
-
-        console.log('INIT RBAC', rules, config);
     }
 
     private nextRoles(roles: RbacRules) {
         this.roles = roles;
-        console.warn('ROLES', this.roles);
         (<BehaviorSubject<RbacRules>>this.roles$).next(roles);
     }
 
@@ -51,28 +44,29 @@ export class NgxRbacService {
         );
     }
 
-    public setBaseRoles(roles: string[], data?: any): void {
+    public setBaseRoles(roles: string[], data?: any, method = 'set'): void {
         this.roles = {};
-        this.addBaseRoles(roles, data);
+        this.addBaseRoles(roles, data, method);
     }
 
-    public addBaseRoles(roles: string[], data?: any): void {
+    public addBaseRoles(roles: string[], data?: any, method = 'add'): void {
+        if (this.config.debug)
+            console.group(`[NgxRbac] ${method} base roles: ${roles.join(', ')}`);
         const rules: RbacRules = {...this.roles};
         roles.forEach(role => {
             this.setRole(rules, role, data);
             rules[role].base = true;
         });
-
+        if (this.config.debug)
+            console.groupEnd();
         this.nextRoles(Object.freeze(rules));
     }
 
     public registerRules(rules: RbacRules) {
-        console.log(rules);
-        console.log(this.allRoles);
         const allRoles = {...this.allRoles};
         Object.keys(rules).forEach(rule => this.registerRule(allRoles, rule, rules[rule]));
         this.allRoles = Object.freeze(allRoles);
-        this.setBaseRoles(this.getBaseRoles());
+        this.setBaseRoles(this.getBaseRoles(), null, 'update');
     }
 
     private registerRule(rules: RbacRules, name: string, rule: RbacRule) {
@@ -86,11 +80,14 @@ export class NgxRbacService {
         }
     }
 
-    private setRole(rules: RbacRules, role: string, data?: any): void {
+    private setRole(rules: RbacRules, role: string, data?: any, by?: string): void {
+        if (this.config.debug)
+            console.log(`Add role "${role}"` + (by ? ` by "${by}"` : '') + (role in this.allRoles ? '' : ` (role doesn\'t exists)`));
+
         rules[role] = {};
-        if (this.rules[role]) {
-            if (this.rules[role].children) {
-                this.rules[role].children.forEach(item => this.setRole(rules, item, data));
+        if (this.allRoles[role]) {
+            if (this.allRoles[role].children) {
+                this.allRoles[role].children.forEach(item => this.setRole(rules, item, data, role));
             }
         }
     }
@@ -98,13 +95,6 @@ export class NgxRbacService {
     public is(rolesToCheck: string | string[]): boolean {
         const toCheck = Array.isArray(rolesToCheck) ? rolesToCheck : [rolesToCheck];
 
-        console.log('check', toCheck, toCheck.some(
-            role => {
-                const rule = this.roles[role];
-
-                return !!rule;
-            },
-        ));
         return toCheck.some(
             role => {
                 const rule = this.roles[role];
@@ -150,7 +140,3 @@ export class NgxRbacService {
         );
     }
 }
-
-// export class NgxRbacServiceConfig extends NgxRbacService {
-//     defaultRoles?: string[];
-// }

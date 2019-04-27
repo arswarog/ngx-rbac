@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { NgxRbacService } from 'ngx-rbac';
 
 @Component({
     selector   : 'app-root',
@@ -9,8 +8,5 @@ import { NgxRbacService } from 'ngx-rbac';
 export class AppComponent {
     title = 'ngx-rbac-demo';
 
-    constructor(public rbac: NgxRbacService) {
-        console.log(rbac);
-        this.rbac.setBaseRoles(['admin']);
-    }
+    constructor() {    }
 }

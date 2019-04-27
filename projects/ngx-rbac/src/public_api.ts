@@ -10,3 +10,4 @@ export * from './lib/rbac.guard';
 export * from './lib/accessible/accessible.component';
 export * from './lib/directives/rbac.directive';
 export * from './lib/unils';
+export * from './lib/tokens';

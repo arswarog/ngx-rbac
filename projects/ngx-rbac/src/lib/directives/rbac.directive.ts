@@ -22,9 +22,6 @@ export class RbacDirective implements OnChanges, OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.subscription = this.service.roles$
-            .pipe(
-                tap(console.warn),
-            )
             .subscribe(() => this.update());
     }
 
@@ -33,14 +30,11 @@ export class RbacDirective implements OnChanges, OnInit, OnDestroy {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        console.log(`ngxRbacClass "${this.rule}"`, this.class);
         this.update();
     }
 
     update() {
-        console.log(this.service.roles, this.class);
         if (this.service.can(this.rule)) {
-            console.log('allow');
             if (this.class.deny) {
                 this.el.nativeElement.classList.remove(this.class.deny || '');
             }
@@ -48,7 +42,6 @@ export class RbacDirective implements OnChanges, OnInit, OnDestroy {
                 this.el.nativeElement.classList.add(this.class.allow || '');
             }
         } else {
-            console.log('deny');
             if (this.class.allow) {
                 this.el.nativeElement.classList.remove(this.class.allow || '');
             }

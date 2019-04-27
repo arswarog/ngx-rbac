@@ -4,6 +4,7 @@ export interface RbacRules {
 
 export interface RbacConfig {
     defaultRoles?: string[];
+    debug?: boolean;
 }
 
 export interface RbacRule {
