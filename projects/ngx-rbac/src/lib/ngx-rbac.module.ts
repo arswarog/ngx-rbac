@@ -5,7 +5,7 @@ import { NgxRbacService } from './ngx-rbac.service';
 import { NgxRbacGuard } from './rbac.guard';
 import { RbacConfig, RbacRules } from './rbac.interface';
 import { RbacDirective } from './directives/rbac.directive';
-import { Config, Rules } from './tokens';
+import { Config, Rules, Section } from './tokens';
 
 @NgModule({
     imports     : [],
@@ -22,18 +22,15 @@ import { Config, Rules } from './tokens';
 })
 export class NgxRbacModule {
     constructor(private rbac: NgxRbacService,
+                @Inject(Rules) rules: RbacRules[],
                 @Inject(Config) config: RbacConfig,
-                @Inject(Rules) rules: RbacRules[]) {
-        console.log('NgxRbacModule loaded.');
-        console.log(rules);
-        console.log(rbac);
-        console.log({...rbac.allRoles});
+                @Inject(Section) @Optional() section: string) {
         if (config.debug) {
-            console.group('[NgxRbac] Load rules');
-            rules.forEach(rule => console.log(rule));
+            console.group('[NgxRbac] Load rules' + (section ? ` for section "${section}"` : ''));
+            rules.forEach(rule => rbac.registerRules(rule, section));
             console.groupEnd();
-        }
-        rules.forEach(rule => rbac.registerRules(rule));
+        } else
+            rules.forEach(rule => rbac.registerRules(rule, section));
     }
 
     static forRoot(rules: RbacRules   = {},
@@ -49,12 +46,12 @@ export class NgxRbacModule {
         };
     }
 
-    static forChild(section: string, rules: RbacRules): ModuleWithProviders {
+    static forChild(rules: RbacRules, section?: string): ModuleWithProviders {
         return {
             ngModule : NgxRbacModule,
             providers: [
                 {provide: Rules, useValue: rules, multi: true},
-                //{provide: Section, useValue: section, multi: true},
+                {provide: Section, useValue: section},
             ],
         };
     }

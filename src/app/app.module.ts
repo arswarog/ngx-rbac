@@ -44,7 +44,7 @@ const rules: RbacRules = {
     imports     : [
         BrowserModule,
         RouterModule.forRoot(routes, {enableTracing: false, useHash: true}),
-        NgxRbacModule.forRoot(rules, {/*defaultRoles: ['user'],*/ debug: true}),
+        NgxRbacModule.forRoot(rules, {defaultRoles: ['user'], debug: true}),
     ],
     providers   : [],
     bootstrap   : [

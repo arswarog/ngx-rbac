@@ -9,7 +9,9 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "predeploy": "ng build --prod",
-    "deploy": "gh-pages -d dist/ngx-rbac-demo"
+    "deploy": "gh-pages -d dist/ngx-rbac-demo",
+    "prepublish": "ng build ngx-rbac",
+    "publish": "cd dist/ngx-rbac && npm publish"
   },
   "private": true,
   "dependencies": {
@@ -36,6 +38,7 @@
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
     "codelyzer": "~4.5.0",
+    "gh-pages": "^2.0.1",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~3.1.1",

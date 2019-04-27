@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { NgxRbacService } from 'ngx-rbac';
 
 @Component({
     selector   : 'app-admin',
@@ -8,9 +7,7 @@ import { NgxRbacService } from 'ngx-rbac';
 })
 export class AdminComponent implements OnInit {
 
-    constructor(private rbac: NgxRbacService) { }
+    constructor() { }
 
-    ngOnInit() {
-        console.log('admin rbac', this.rbac);
-    }
+    ngOnInit() { }
 }

@@ -53,8 +53,6 @@ export class NgxRbacGuard implements CanActivateChild, CanActivate, CanLoad {
     public canActivateChild(route: ActivatedRouteSnapshot,
                             state: RouterStateSnapshot): Observable<boolean> {
         return new Observable(observer => {
-            console.log('RBAC GUARD', this.rbac.roles);
-
             if (!route.data.roles) {
                 return observer.next(true);
             }

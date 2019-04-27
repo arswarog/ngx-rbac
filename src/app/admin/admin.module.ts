@@ -37,7 +37,10 @@ const routes: Routes = [
 
 const rules: RbacRules = {
     admin: {
-        children: ['human'],
+        children: ['admin.human'],
+    },
+    human: {
+        children: ['post.edit'],
     },
 };
 
@@ -50,7 +53,7 @@ const rules: RbacRules = {
     imports     : [
         CommonModule,
         RouterModule.forChild(routes),
-        NgxRbacModule.forChild('admin', rules),
+        NgxRbacModule.forChild(rules, 'admin'),
     ],
 })
 export class AdminModule {

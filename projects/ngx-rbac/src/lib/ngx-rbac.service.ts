@@ -62,17 +62,45 @@ export class NgxRbacService {
         this.nextRoles(Object.freeze(rules));
     }
 
-    public registerRules(rules: RbacRules) {
+    public registerRules(rules: RbacRules, section?: string) {
         const allRoles = {...this.allRoles};
-        Object.keys(rules).forEach(rule => this.registerRule(allRoles, rule, rules[rule]));
+        Object.keys(rules).forEach(rule => {
+            if (!section)
+                this.registerRule(allRoles, rule, rules[rule], section);
+            else if (rule === section) {
+                if (this.config.debug)
+                    console.log(`Info: Prefix "${section}" doesn\'t append because rule name equal section name`);
+                this.registerRule(allRoles, rule, rules[rule], section);
+            } else
+                this.registerRule(allRoles, section + '.' + rule, rules[rule], section);
+        });
         this.allRoles = Object.freeze(allRoles);
         this.setBaseRoles(this.getBaseRoles(), null, 'update');
     }
 
-    private registerRule(rules: RbacRules, name: string, rule: RbacRule) {
-        rules[name] = rule;
+    private registerRule(rules: RbacRules, name: string, rule: RbacRule, by?: string) {
+        if (name in rules) {
+            if (!rules[name].children)
+                rules[name].children = [];
+            Object.assign(
+                rules[name],
+                {
+                    ...rule,
+                    children: [
+                        ...rules[name].children,
+                        ...rule.children ? rule.children : [],
+                    ],
+                },
+            );
+        } else {
+            if (this.config.debug)
+                console.log(`Register rule "${name}"` + (by ? ` by "${by}"` : ''));
+            rules[name] = rule;
+        }
         if (rule.children) {
             rule.children.forEach(item => {
+                if (this.config.debug)
+                    console.log(`Register rule "${item}" by "${name}"`);
                 if (!(item in rules)) {
                     rules[item] = {};
                 }

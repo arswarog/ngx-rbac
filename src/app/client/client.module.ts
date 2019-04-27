@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RbacRules } from '../../../projects/ngx-rbac/src/lib/rbac.interface';
 import { ClientComponent } from './client.component';
 import { PostComponent } from './post/post.component';
 import { RouterModule, Routes } from '@angular/router';
@@ -26,6 +27,18 @@ const routes: Routes = [
     },
 ];
 
+const rules: RbacRules = {
+    moderator: {
+        children: [
+            'comment.approve',
+        ],
+    },
+    user     : {
+        children: [
+            'post.view',
+        ],
+    },
+};
 
 @NgModule({
     declarations: [
@@ -40,7 +53,7 @@ const routes: Routes = [
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
-        NgxRbacModule.forChild('asd', {forChild: {children: ['asd']}}),
+        NgxRbacModule.forChild(rules),
     ],
     exports     : [
         PostComponent,
